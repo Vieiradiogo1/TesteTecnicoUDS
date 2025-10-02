@@ -1,0 +1,26 @@
+<div style="padding: 20px; font-family: sans-serif;">
+  <h1>Lista de Usuários</h1>
+
+  <a routerLink="/register" style="margin-bottom: 20px; display: inline-block;">
+    Cadastrar Novo Usuário
+  </a>
+
+  <div *ngIf="users.length === 0">
+    <p>Nenhum usuário encontrado.</p>
+  </div>
+
+  <table *ngIf="users.length > 0" border="1" style="width: 100%; border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th style="text-align: left; padding: 8px;">Nome</th>
+        <th style="text-align: left; padding: 8px;">Email</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td style="padding: 8px;">{{ user.name }}</td>
+        <td style="padding: 8px;">{{ user.email }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

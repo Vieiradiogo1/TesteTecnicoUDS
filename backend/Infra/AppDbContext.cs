@@ -1,5 +1,5 @@
-﻿using Domain;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Domain;
 
 public class AppDbContext : DbContext
 {

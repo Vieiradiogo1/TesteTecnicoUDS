@@ -2,8 +2,25 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Http.Json;
+using Domain; 
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=users.db"));
@@ -52,16 +69,27 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAngularApp");
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapPost("/user", async (RegisterUser command, RegisterUserHandler handler) =>
+app.MapPost("/users", async (RegisterUser command, RegisterUserHandler handler) =>
 {
-    var user = await handler.Handle(command);
-    return Results.Ok(new { user.Id, user.Name, user.Email });
+    try
+    {
+        var user = await handler.Handle(command);
+        return Results.Ok(new { user.Id, user.Name, user.Email });
+    }
+    catch (Exception ex)
+    {
+        // mensagem de erro para o front
+        return Results.BadRequest(new { message = ex.Message });
+    }
 });
 
-app.MapGet("/user", (ListUsers listUsers) =>
+app.MapGet("/users", (ListUsers listUsers) =>
 {
     var users = listUsers.Handle();
     return Results.Ok(users.Select(u => new { u.Id, u.Name, u.Email }));
